@@ -3,11 +3,18 @@ class OrderBook:
 		self.buy_orders = []
 		self.sell_orders = []
 
+		self.best_buy = 0
+		self.best_sell = 0
+
 	def add_order(self, order):
 		if order.isBuy:
 			self.buy_orders.append(order)
+			self.buy_orders.sort(key=lambda x: x.price, reverse=True)
+			self.best_buy = self.buy_orders[0].price
 		else:
 			self.sell_orders.append(order)
+			self.sell_orders.sort(key=lambda x: x.price)
+			self.best_sell = self.sell_orders[0].price
 
 	def print_orderbook(self):
 		print("Buy Orders:")
@@ -20,9 +27,6 @@ class OrderBook:
 
 
 	def match_orders(self):
-		self.buy_orders.sort(key=lambda x: x.price, reverse=True)
-		self.sell_orders.sort(key=lambda x: x.price)
-
 		while(len(self.buy_orders) != 0 and len(self.sell_orders) != 0 
 			and self.buy_orders[0].price >= self.sell_orders[0].price):
 
@@ -51,6 +55,17 @@ class OrderBook:
 				self.sell_orders.pop(0)
 
 
+			if len(self.buy_orders) > 0:
+				self.best_buy = self.buy_orders[0].price
+			else:
+				self.best_buy = 0
+
+			if len(self.sell_orders)> 0:
+				self.best_sell = self.sell_orders[0].price
+			else:
+				self.best_sell = 0
+
+
 
 
 class Order:
@@ -65,3 +80,12 @@ class User:
 		self.balance = 1000;
 		self.orders = []
 		self.client_id = client_id;
+
+
+
+
+
+
+
+
+
