@@ -1,6 +1,12 @@
 import json
 import socket
 
+class Client:
+	def __init__(self):
+		self.account_value = 0
+		self.amount_bought = 0
+		self.amount_shorted = 0
+
 def is_json(message):
 	try:
 		json.loads(message)
@@ -9,7 +15,7 @@ def is_json(message):
 		return False
 
 def user_actions():
-	action = input("(ORDERS) or (MAKE) an order: ")
+	action = input("(ORDERS), (ACCOUNT), or (MAKE) an order: ")
 	if action == "MAKE":
 		valuation = input("What valuation? ")
 		spread = input("What spread? ")

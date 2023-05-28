@@ -1,5 +1,7 @@
 import socket
 import client_controls
+import os
+from _thread import *
 
 ClientMultiSocket = socket.socket()
 host = '127.0.0.1'

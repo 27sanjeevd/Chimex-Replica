@@ -38,12 +38,14 @@ class OrderBook:
 				self.sell_orders[0].client.client_add.sendall(str.encode("Matched!\n"))
 
 
+
 			if self.buy_orders[0].amount > self.sell_orders[0].amount:
 				self.buy_orders[0].amount -= self.sell_orders[0].amount
 
 				self.buy_orders[0].client.balance -= sold_price * self.sell_orders[0].amount
 				self.sell_orders[0].client.balance += sold_price * self.sell_orders[0].amount
 
+				self.sell_orders[0].client.owned -= 1
 				self.sell_orders.pop(0)
 
 			elif self.buy_orders[0].amount < self.sell_orders[0].amount:
@@ -52,11 +54,15 @@ class OrderBook:
 				self.buy_orders[0].client.balance -= sold_price * self.buy_orders[0].amount
 				self.sell_orders[0].client.balance += sold_price * self.buy_orders[0].amount
 
+				self.buy_orders[0].client.owned += 1
 				self.buy_orders.pop(0)
 			else:
 				self.buy_orders[0].client.balance -= sold_price * self.buy_orders[0].amount
 				self.sell_orders[0].client.balance += sold_price * self.buy_orders[0].amount
 
+
+				self.sell_orders[0].client.owned -= 1
+				self.buy_orders[0].client.owned += 1
 				self.buy_orders.pop(0)
 				self.sell_orders.pop(0)
 
@@ -88,6 +94,7 @@ class User:
 		self.orders = []
 		self.client_id = client_id
 		self.client_add = client_add
+		self.owned = 0
 
 	def add_order(self, order):
 		self.orders.append(order)

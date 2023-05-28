@@ -9,20 +9,24 @@ def is_json(message):
 	except ValueError:
 		return False
 
-def decode_message(message, order_book):
+def decode_message(message, order_book, user):
 	try:
 		if is_json(message):
 			decoded_data = message.decode('utf-8')
 			json_data = json.loads(decoded_data)
 
-			return json_data
+			return True, json_data
 		else:
-			if message.decode('utf-8') == "ORDERS":
+			decoded = message.decode('utf-8')
+			if decoded == "ORDERS":
 				order_book.print_orderbook()
+				return False, None
 
-			return None
+			elif decoded == "ACCOUNT":
+				return True, "ACCOUNT"
+
 	except:
-		return None
+		return False, None
 
 def make_orders(user, valuation, spread):
 	lower_val = valuation - spread

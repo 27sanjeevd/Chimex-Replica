@@ -36,14 +36,22 @@ def multi_threaded_client(connection, user, arr_pos):
 			if not data:
 				break
 
-			json_data = server_controls.decode_message(data, order_book)
-			if json_data:
-				response = 'Valuation: ' + json_data['valuation'] + " Spread: " + json_data['spread']
-				print(response)
+			check1, json_data = server_controls.decode_message(data, order_book, user)
+			if check1:
+				if json_data == "ACCOUNT":
+					if user.owned > 0:
+						response = f"You own {user.owned} shares"
+					elif user.owned < 0:
+						response = f"You shorted {user.owned * -1} shares"
+					else:
+						response = f"You are market neutral"
+				else:
+					response = 'Valuation: ' + json_data['valuation'] + " Spread: " + json_data['spread']
+					print(response)
 
-				buy_order, sell_order = server_controls.make_orders(user, float(json_data['valuation']), float(json_data['spread']))
-				order_book.add_order(buy_order)
-				order_book.add_order(sell_order)
+					buy_order, sell_order = server_controls.make_orders(user, float(json_data['valuation']), float(json_data['spread']))
+					order_book.add_order(buy_order)
+					order_book.add_order(sell_order)
 			else:
 				response = "Printed Order"
 
