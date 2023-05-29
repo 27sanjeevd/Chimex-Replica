@@ -1,3 +1,5 @@
+import threading
+
 class OrderBook:
 	def __init__(self):
 		self.buy_orders = []
@@ -5,25 +7,60 @@ class OrderBook:
 
 		self.best_buy = 0
 		self.best_sell = 0
+	
+		self.buy_orders_lock = threading.Lock()
+		self.sell_orders_lock = threading.Lock()
+		self.best_buy_lock = threading.Lock()
+		self.best_sell_lock = threading.Lock()
 
 	def remove_order(self, order):
 		if order.isBuy:
+			self.buy_orders_lock.acquire()
+			self.best_buy_lock.acquire()
 			if order in self.buy_orders:
 				self.buy_orders.remove(order)
+				if len(self.buy_orders) > 0:
+					self.best_buy = self.buy_orders[0].price
+				else:
+					self.best_buy = 0
+
+			self.buy_orders_lock.release()
+			self.best_buy_lock.release()
 		else:
+			self.sell_orders_lock.acquire()
+			self.best_sell_lock.acquire()
 			if order in self.sell_orders:
 				self.sell_orders.remove(order)
+				if len(self.sell_orders) > 0:
+					self.best_sell = self.sell_orders[0].price
+				else:
+					self.best_sell = 0
+
+			self.sell_orders_lock.release()
+			self.best_sell_lock.release()
 
 
 	def add_order(self, order):
 		if order.isBuy:
+			self.buy_orders_lock.acquire()
+			self.best_buy_lock.acquire()
+
 			self.buy_orders.append(order)
 			self.buy_orders.sort(key=lambda x: x.price, reverse=True)
 			self.best_buy = self.buy_orders[0].price
+
+			self.buy_orders_lock.release()
+			self.best_buy_lock.release()
 		else:
+			self.sell_orders_lock.acquire()
+			self.best_sell_lock.acquire()
+
 			self.sell_orders.append(order)
 			self.sell_orders.sort(key=lambda x: x.price)
 			self.best_sell = self.sell_orders[0].price
+
+			self.sell_orders_lock.release()
+			self.best_sell_lock.release()
 
 	def return_orderbook(self):
 		output = {}
@@ -58,6 +95,12 @@ class OrderBook:
 
 
 	def match_orders(self):
+
+		self.buy_orders_lock.acquire()
+		self.best_buy_lock.acquire()
+		self.sell_orders_lock.acquire()
+		self.best_sell_lock.acquire()
+
 		while(len(self.buy_orders) != 0 and len(self.sell_orders) != 0 
 			and self.buy_orders[0].price >= self.sell_orders[0].price):
 
@@ -120,6 +163,11 @@ class OrderBook:
 				self.best_sell = self.sell_orders[0].price
 			else:
 				self.best_sell = 0
+
+		self.buy_orders_lock.release()
+		self.best_buy_lock.release()
+		self.sell_orders_lock.release()
+		self.best_sell_lock.release()
 
 
 

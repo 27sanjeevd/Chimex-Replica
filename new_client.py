@@ -39,7 +39,7 @@ def on_button_click():
 
 def update_prev_orders():
 	global prev_orders
-	prev_orders = ""
+	prev_orders = "Previous Orders:\n"
 	if "PREVIOUS" in data:
 		for prev in data['PREVIOUS']:
 			prev_orders += prev
@@ -56,11 +56,11 @@ def update_best_orders():
 	if "Sell" in data:
 		ask = data['Sell']
 
-	data_label.config(text="Bid: " + str(bid) + " Ask: " + str(ask))
+	data_label.config(text="Top Bid: " + str(bid) + "\nTop Ask: " + str(ask))
 
 def update_curr_orders():
     global orders
-    orders = ""
+    orders = "My Orders:\n"
     if "ORDERS" in data:
     	orders1 = data['ORDERS']
     	for x in orders1:
@@ -126,20 +126,25 @@ button.grid(row=2, column=0, padx=10, pady=5, sticky="e")
 error_entry = tk.Label(window)
 error_entry.grid(row=3, column=0, padx=10, pady=5, sticky="e")
 
-data_label = tk.Label(window, text="Bid: " + str(bid) + " Ask: " + str(ask))
+data_label = tk.Label(window, text="Top Bid: " + str(bid) + "\nTop Ask: " + str(ask))
 data_label.grid(row=4, column=0, padx=10, pady=5, sticky="e")
+data_label.configure(background="skyblue")
 
 orders_label = tk.Label(window, text=str(orders))
 orders_label.grid(row=4, column=1, padx=10, pady=5, sticky="e")
+orders_label.configure(background="skyblue")
 
 balance_label = tk.Label(window, text=str(balance))
 balance_label.grid(row=4, column=2, padx=10, pady=5, sticky="e")
+balance_label.configure(background="skyblue")
 
 prev_orders_label = tk.Label(window, text=str(prev_orders))
 prev_orders_label.grid(row=5, column=0, padx=10, pady=5, sticky="e")
+prev_orders_label.configure(background="skyblue")
 
 position_label = tk.Label(window, text=str(owned))
 position_label.grid(row=5, column=2, padx=10, pady=5, sticky="e")
+position_label.configure(background="skyblue")
 
 receive_thread = Thread(target=receive_updates)
 receive_thread.start()
