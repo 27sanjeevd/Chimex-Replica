@@ -13,6 +13,8 @@ bid = 0
 ask = 0
 orders = ""
 prev_orders = ""
+balance = "Balance: N/A"
+owned = "Position: N/A"
 
 print('Waiting for connection response')
 
@@ -46,7 +48,6 @@ def update_prev_orders():
 	prev_orders_label.config(text=prev_orders)
 
 
-
 def update_best_orders():
 	global bid
 	global ask
@@ -67,6 +68,18 @@ def update_curr_orders():
 
     	orders_label.config(text=str(orders))
 
+def update_positions():
+	global balance
+	global owned
+
+	if "BALANCE" in data:
+		balance = "Balance: " + str(data['BALANCE'])
+	if "ACCOUNT" in data:
+		owned = data['ACCOUNT']
+
+	balance_label.config(text=str(balance))
+	position_label.config(text=str(owned))
+
 def receive_updates():
 	while True:
 		res = ClientMultiSocket.recv(1024)
@@ -80,6 +93,7 @@ def receive_updates():
 			update_best_orders()
 			update_curr_orders()
 			update_prev_orders()
+			update_positions()
 
 window = tk.Tk()
 window.title("Value Calculator")
@@ -95,40 +109,37 @@ window.geometry(f"{window_width}x{window_height}")
 
 # Create labels for valuation and spread
 valuation_label = tk.Label(window, text="Valuation:")
-#valuation_label.pack()
 valuation_label.grid(row=0, column=0, padx=10, pady=5, sticky="e")
 
 valuation_entry = tk.Entry(window)
-#valuation_entry.pack()
 valuation_entry.grid(row=1, column=0, padx=10, pady=5, sticky="e")
 
 spread_label = tk.Label(window, text="Spread:")
-#spread_label.pack()
 spread_label.grid(row=0, column=1, padx=10, pady=5, sticky="e")
 
 spread_entry = tk.Entry(window)
-#spread_entry.pack()
 spread_entry.grid(row=1, column=1, padx=10, pady=5, sticky="e")
 
 button = tk.Button(window, text="Send Values", command=on_button_click)
-#button.pack(pady=10)
 button.grid(row=2, column=0, padx=10, pady=5, sticky="e")
 
 error_entry = tk.Label(window)
-#error_entry.pack()
 error_entry.grid(row=3, column=0, padx=10, pady=5, sticky="e")
 
 data_label = tk.Label(window, text="Bid: " + str(bid) + " Ask: " + str(ask))
-#data_label.pack()
 data_label.grid(row=4, column=0, padx=10, pady=5, sticky="e")
 
 orders_label = tk.Label(window, text=str(orders))
-#data_label.pack()
 orders_label.grid(row=4, column=1, padx=10, pady=5, sticky="e")
 
+balance_label = tk.Label(window, text=str(balance))
+balance_label.grid(row=4, column=2, padx=10, pady=5, sticky="e")
+
 prev_orders_label = tk.Label(window, text=str(prev_orders))
-#data_label.pack()
-prev_orders_label.grid(row=6, column=0, padx=10, pady=5, sticky="e")
+prev_orders_label.grid(row=5, column=0, padx=10, pady=5, sticky="e")
+
+position_label = tk.Label(window, text=str(owned))
+position_label.grid(row=5, column=2, padx=10, pady=5, sticky="e")
 
 receive_thread = Thread(target=receive_updates)
 receive_thread.start()

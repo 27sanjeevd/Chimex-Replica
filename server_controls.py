@@ -38,7 +38,13 @@ def update_action(order_book, user):
 		response['PREVIOUS'].append(prev)
 
 	response['BALANCE'] = user.balance
-	response['OWNED'] = user.owned
+
+	if user.owned > 0:
+		response['ACCOUNT'] = f"You own {user.owned} shares"
+	elif user.owned < 0:
+		response['ACCOUNT'] = f"You shorted {user.owned * -1} shares"
+	else:
+		response['ACCOUNT'] = f"You are market neutral"
 
 	json_data = json.dumps(response)
 	encoded_data = json_data.encode('utf-8')
@@ -90,7 +96,6 @@ def server_action(json_data, order_book, user):
 			response['PREVIOUS'].append(prev)
 
 		response['BALANCE'] = user.balance
-		response['OWNED'] = user.owned
 
 	response['Bid'] = order_book.best_buy
 	response['Sell'] = order_book.best_sell
