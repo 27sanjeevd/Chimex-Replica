@@ -16,6 +16,28 @@ class OrderBook:
 			self.sell_orders.sort(key=lambda x: x.price)
 			self.best_sell = self.sell_orders[0].price
 
+	def return_orderbook(self):
+		output = {}
+		output['BUY'] = []
+		output['SELL'] = []
+		for order in self.buy_orders:
+			curr = {
+				"Price": order.price,
+				"Quantity": order.amount,
+				"User": order.client.client_id
+			}
+			output['BUY'].append(curr)
+
+		for order in self.sell_orders:
+			curr = {
+				"Price": order.price,
+				"Quantity": order.amount,
+				"User": order.client.client_id
+			}
+			output['SELL'].append(curr)
+
+		return output
+
 	def print_orderbook(self):
 		print("\nBuy Orders:")
 		for order in self.buy_orders:
@@ -31,12 +53,13 @@ class OrderBook:
 			and self.buy_orders[0].price >= self.sell_orders[0].price):
 
 			sold_price = (self.buy_orders[0].price + self.sell_orders[0].price)/2
+			"""
 			if self.buy_orders[0].client.client_add.fileno() != -1:
 				self.buy_orders[0].client.client_add.sendall(str.encode("Matched!\n"))
 
 			if self.sell_orders[0].client.client_add.fileno() != -1:
 				self.sell_orders[0].client.client_add.sendall(str.encode("Matched!\n"))
-
+			"""
 
 
 			if self.buy_orders[0].amount > self.sell_orders[0].amount:
