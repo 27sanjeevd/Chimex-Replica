@@ -6,6 +6,15 @@ class OrderBook:
 		self.best_buy = 0
 		self.best_sell = 0
 
+	def remove_order(self, order):
+		if order.isBuy:
+			if order in self.buy_orders:
+				self.buy_orders.remove(order)
+		else:
+			if order in self.sell_orders:
+				self.sell_orders.remove(order)
+
+
 	def add_order(self, order):
 		if order.isBuy:
 			self.buy_orders.append(order)
@@ -65,27 +74,39 @@ class OrderBook:
 			if self.buy_orders[0].amount > self.sell_orders[0].amount:
 				self.buy_orders[0].amount -= self.sell_orders[0].amount
 
+				self.buy_orders[0].client.past_orders.append(f"Bought @ {sold_price} from {self.sell_orders[0].client.client_id}\n")
+				self.sell_orders[0].client.past_orders.append(f"Sold @ {sold_price} to {self.buy_orders[0].client.client_id}\n")
+
 				self.buy_orders[0].client.balance -= sold_price * self.sell_orders[0].amount
 				self.sell_orders[0].client.balance += sold_price * self.sell_orders[0].amount
 
 				self.sell_orders[0].client.owned -= 1
+				self.sell_orders[0].client.orders.remove(self.sell_orders[0])
 				self.sell_orders.pop(0)
 
 			elif self.buy_orders[0].amount < self.sell_orders[0].amount:
 				self.sell_orders[0].amount -= self.buy_orders[0].amount
 
+				self.buy_orders[0].client.past_orders.append(f"Bought @ {sold_price} from {self.sell_orders[0].client.client_id}\n")
+				self.sell_orders[0].client.past_orders.append(f"Sold @ {sold_price} to {self.buy_orders[0].client.client_id}\n")
+
 				self.buy_orders[0].client.balance -= sold_price * self.buy_orders[0].amount
 				self.sell_orders[0].client.balance += sold_price * self.buy_orders[0].amount
 
 				self.buy_orders[0].client.owned += 1
+				self.buy_orders[0].client.orders.remove(self.buy_orders[0])
 				self.buy_orders.pop(0)
 			else:
 				self.buy_orders[0].client.balance -= sold_price * self.buy_orders[0].amount
 				self.sell_orders[0].client.balance += sold_price * self.buy_orders[0].amount
 
+				self.buy_orders[0].client.past_orders.append(f"Bought @ {sold_price} from {self.sell_orders[0].client.client_id}\n")
+				self.sell_orders[0].client.past_orders.append(f"Sold @ {sold_price} to {self.buy_orders[0].client.client_id}\n")
 
 				self.sell_orders[0].client.owned -= 1
 				self.buy_orders[0].client.owned += 1
+				self.sell_orders[0].client.orders.remove(self.sell_orders[0])
+				self.buy_orders[0].client.orders.remove(self.buy_orders[0])
 				self.buy_orders.pop(0)
 				self.sell_orders.pop(0)
 
@@ -103,6 +124,8 @@ class OrderBook:
 
 
 
+
+
 class Order:
 	def __init__(self, price, amount, user, isBuy):
 		self.price = price
@@ -115,6 +138,7 @@ class User:
 	def __init__(self, client_id, client_add):
 		self.balance = 1000
 		self.orders = []
+		self.past_orders = []
 		self.client_id = client_id
 		self.client_add = client_add
 		self.owned = 0

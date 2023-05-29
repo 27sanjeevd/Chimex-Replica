@@ -14,6 +14,19 @@ def is_json(message):
 	except ValueError:
 		return False
 
+def client_order(valuation, spread):
+	data = {
+		"MAKE": True,
+		"valuation": valuation,
+		"spread": spread
+	}
+
+	json_data = json.dumps(data)
+	encoded_data = json_data.encode('utf-8')
+	return encoded_data
+
+
+"""
 def user_actions():
 	action = input("(MARKET), (ACCOUNT), (ORDERS), or (MAKE) an order: ")
 	data = {}
@@ -34,3 +47,4 @@ def user_actions():
 	json_data = json.dumps(data)
 	encoded_data = json_data.encode('utf-8')
 	return encoded_data
+"""

@@ -20,41 +20,77 @@ def decode_message(message, order_book, user):
 	except:
 		return None
 
+def update_action(order_book, user):
+	response = {}
+	response['Bid'] = order_book.best_buy
+	response['Sell'] = order_book.best_sell
+
+	list1 = user.orders
+	response['ORDERS'] = []
+	for order1 in list1:
+		if order1.isBuy:
+			response['ORDERS'].append(f"Buying {order1.amount} for {order1.price}\n")
+		else:
+			response['ORDERS'].append(f"Selling {order1.amount} for {order1.price}\n")
+	
+	response['PREVIOUS'] = []
+	for prev in user.past_orders:
+		response['PREVIOUS'].append(prev)
+
+	response['BALANCE'] = user.balance
+	response['OWNED'] = user.owned
+
+	json_data = json.dumps(response)
+	encoded_data = json_data.encode('utf-8')
+	return encoded_data
+
+
 def server_action(json_data, order_book, user):
 	response = {}
 	if json_data:
-		if "ACCOUNT" in json_data:
-			if user.owned > 0:
-				response['ACCOUNT'] = f"You own {user.owned} shares"
-			elif user.owned < 0:
-				response['ACCOUNT'] = f"You shorted {user.owned * -1} shares"
-			else:
-				response['ACCOUNT'] = f"You are market neutral"
-		elif "MARKET" in json_data:
-			order_book.print_orderbook()
-			market = order_book.return_orderbook()
-			response['MARKET'] = market
 
-		elif "ORDERS" in json_data:
-			list1 = user.orders
-			response['ORDERS'] = []
-			for order1 in list1:
-				if order1.isBuy:
-					response['ORDERS'].append(f"Buying {order1.amount} for {order1.price}\n")
-				else:
-					response['ORDERS'].append(f"Selling {order1.amount} for {order1.price}\n")
-
-		elif "MAKE" in json_data:
+		if "MAKE" in json_data:
 			response['MAKE'] = {}
 			response['MAKE']['Valuation'] = json_data['valuation']
 			response['MAKE']['Spread'] = json_data['spread']
 			print(response)
 
+			for user_order in user.orders:
+				order_book.remove_order(user_order)
+
+			user.orders = []
+
 			buy_order, sell_order = make_orders(user, float(json_data['valuation']), float(json_data['spread']))
 			order_book.add_order(buy_order)
 			order_book.add_order(sell_order)
+
+
+
+		if user.owned > 0:
+			response['ACCOUNT'] = f"You own {user.owned} shares"
+		elif user.owned < 0:
+			response['ACCOUNT'] = f"You shorted {user.owned * -1} shares"
 		else:
-			response['PRINTED'] = "Printed Order"
+			response['ACCOUNT'] = f"You are market neutral"
+		
+		order_book.print_orderbook()
+		market = order_book.return_orderbook()
+		response['MARKET'] = market
+
+		list1 = user.orders
+		response['ORDERS'] = []
+		for order1 in list1:
+			if order1.isBuy:
+				response['ORDERS'].append(f"Buying {order1.amount} for {order1.price}\n")
+			else:
+				response['ORDERS'].append(f"Selling {order1.amount} for {order1.price}\n")
+
+		response['PREVIOUS'] = []
+		for prev in user.past_orders:
+			response['PREVIOUS'].append(prev)
+
+		response['BALANCE'] = user.balance
+		response['OWNED'] = user.owned
 
 	response['Bid'] = order_book.best_buy
 	response['Sell'] = order_book.best_sell
