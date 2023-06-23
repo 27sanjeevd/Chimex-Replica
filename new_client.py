@@ -2,6 +2,7 @@ import socket
 import client_controls
 import json
 import os
+import threading
 from threading import Thread
 import tkinter as tk
 
@@ -15,6 +16,8 @@ orders = ""
 prev_orders = ""
 balance = "Balance: N/A"
 owned = "Position: N/A"
+
+data_lock = threading.Lock()
 
 print('Waiting for connection response')
 
@@ -87,6 +90,8 @@ def receive_updates():
 			decoded_data = res.decode('utf-8')
 			json_data = json.loads(decoded_data)
 
+			data_lock.acquire()
+
 			global data
 			data = json_data
 
@@ -94,6 +99,8 @@ def receive_updates():
 			update_curr_orders()
 			update_prev_orders()
 			update_positions()
+
+			data_lock.release()
 
 window = tk.Tk()
 window.title("Value Calculator")
@@ -145,6 +152,10 @@ prev_orders_label.configure(background="skyblue")
 position_label = tk.Label(window, text=str(owned))
 position_label.grid(row=5, column=2, padx=10, pady=5, sticky="e")
 position_label.configure(background="skyblue")
+
+
+
+
 
 receive_thread = Thread(target=receive_updates)
 receive_thread.start()
