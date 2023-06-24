@@ -28,16 +28,25 @@ def update_action(order_book, user):
 	list1 = user.orders
 	response['ORDERS'] = []
 	for order1 in list1:
+		new_order_creation = []
 		if order1.isBuy:
-			response['ORDERS'].append(f"Buying {order1.amount} for {order1.price}\n")
+			new_order_creation = ["BUY", order1.amount, order1.price]
+			#response['ORDERS'].append(f"Buying {order1.amount} for {order1.price}\n")
 		else:
-			response['ORDERS'].append(f"Selling {order1.amount} for {order1.price}\n")
+			new_order_creation = ["SELL", order1.amount, order1.price]
+			#response['ORDERS'].append(f"Selling {order1.amount} for {order1.price}\n")
+
+
+		response['ORDERS'].append(new_order_creation)
 	
 	response['PREVIOUS'] = []
 	for prev in user.past_orders:
 		response['PREVIOUS'].append(prev)
 
 	response['BALANCE'] = user.balance
+
+	market = order_book.return_orderbook()
+	response['MARKET'] = market
 
 	if user.owned > 0:
 		response['ACCOUNT'] = f"You own {user.owned} shares"
@@ -86,10 +95,16 @@ def server_action(json_data, order_book, user):
 		list1 = user.orders
 		response['ORDERS'] = []
 		for order1 in list1:
+			new_order_creation = []
 			if order1.isBuy:
-				response['ORDERS'].append(f"Buying {order1.amount} for {order1.price}\n")
+				new_order_creation = ["BUY", order1.amount, order1.price]
+				#response['ORDERS'].append(f"Buying {order1.amount} for {order1.price}\n")
 			else:
-				response['ORDERS'].append(f"Selling {order1.amount} for {order1.price}\n")
+				new_order_creation = ["SELL", order1.amount, order1.price]
+				#response['ORDERS'].append(f"Selling {order1.amount} for {order1.price}\n")
+
+
+			response['ORDERS'].append(new_order_creation)
 
 		response['PREVIOUS'] = []
 		for prev in user.past_orders:

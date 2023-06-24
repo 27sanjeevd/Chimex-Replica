@@ -24,27 +24,3 @@ def client_order(valuation, spread):
 	json_data = json.dumps(data)
 	encoded_data = json_data.encode('utf-8')
 	return encoded_data
-
-
-"""
-def user_actions():
-	action = input("(MARKET), (ACCOUNT), (ORDERS), or (MAKE) an order: ")
-	data = {}
-
-	if action == "MAKE":
-		valuation = input("What valuation? ")
-		spread = input("What spread? ")
-
-		data = {
-			"MAKE": True,
-			"valuation": valuation,
-			"spread": spread
-		}
-	else:
-		data[action] = True
-
-
-	json_data = json.dumps(data)
-	encoded_data = json_data.encode('utf-8')
-	return encoded_data
-"""
